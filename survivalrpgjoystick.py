@@ -1654,6 +1654,7 @@ class Actor(pygame.sprite.Sprite):
             Actor.actors[self.number] = self
             Healthbar(self)
             Magicbar(self)
+
         def spell1(self):
             pass
                 
@@ -1722,6 +1723,7 @@ class Actor(pygame.sprite.Sprite):
                     self.x -= Game.ACTOR_SPEED * 6
                 if pressed_keys[pygame.K_RIGHT]:
                     self.x += Game.ACTOR_SPEED * 6                   
+
                 if self.stunned < 0:
                     self.stunned = 0
                 if Game.food > 99 and Game.water > 99:
@@ -2533,6 +2535,7 @@ class Viewer(object):
             if self.j.get_axis(1) > 0.2:
                 print("runter")
                 self.actor1.y += Game.ACTOR_SPEED*6
+
             if self.j.get_axis(0) < -0.2:
                 print("links") 
                 self.actor1.x -= Game.ACTOR_SPEED*6   
