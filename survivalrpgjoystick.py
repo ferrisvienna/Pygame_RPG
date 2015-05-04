@@ -1606,7 +1606,7 @@ class Actor(pygame.sprite.Sprite):
         number = 0
         shoot = pygame.mixer.Sound(os.path.join('data','magic-missile-1.ogg'))  #load sound
 
-        def __init__(self, level, startpos=(700,100), hitpointsfull=600):
+        def __init__(self, level, startpos=(700,100), hitpointsfull=1000):
         #rebalance
 
             pygame.sprite.Sprite.__init__(self, self.groups ) #call parent class. NEVER FORGET !
@@ -1904,7 +1904,7 @@ class Actor2(pygame.sprite.Sprite):
         actors2 = {} # a dictionary of all monsters
         number = 0
 
-        def __init__(self, level, startpos=(700,400), hitpointsfull=1000):
+        def __init__(self, level, startpos=(700,400), hitpointsfull=7502):
         #rebalance
 
             pygame.sprite.Sprite.__init__(self, self.groups ) #call parent class. NEVER FORGET !
@@ -2712,6 +2712,11 @@ class Viewer(object):
                       myactor.x += 10
                       myactor.magic += 1
                       myactor.hitpoints-=30.00 - Game.ACTOR_DEF
+            for mymonster in self.monstergroup:
+                crashgroup = pygame.sprite.spritecollide(mymonster, self.raingroup, False)
+                for myexplosion in crashgroup:
+                      if mymonster.burntime > 0.0:
+                          mymonster.burntime-= 20.0 * Game.MAGIC_POWER         
             for mymonster in self.monstergroup:
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.explosiongroup, False)
                 for myexplosion in crashgroup:
