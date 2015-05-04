@@ -34,7 +34,7 @@ class Game(object):
     SPAWNRATE2 = 0.005
     XP = 0.00
     ACTOR_NEEDEDXP = 300
-    ACTOR_REGEN = 0.23
+    ACTOR_REGEN = 0.75
     ACTOR_ATKDMG = 10
     ACTOR_DEF = 0.5
     ACTOR_SPEED = 0.5
@@ -1654,9 +1654,8 @@ class Actor(pygame.sprite.Sprite):
             Actor.actors[self.number] = self
             Healthbar(self)
             Magicbar(self)
-
-        def spell1(self):
-            pass
+        def spell(self):
+            print("Baller baller peng peng!")
                 
         def getChar(self):
             #Tile = 50*50
@@ -1667,6 +1666,9 @@ class Actor(pygame.sprite.Sprite):
             except:
                 char="?"
             return char
+            
+           
+
             
         def update(self, seconds):
             pressed_keys = pygame.key.get_pressed()
@@ -1716,14 +1718,20 @@ class Actor(pygame.sprite.Sprite):
                 self.stunned -= seconds
             if self.stunned < 1:
                 if pressed_keys[pygame.K_UP]:
-                    self.y -= Game.ACTOR_SPEED * 6
+                    self.y -= Game.ACTOR_SPEED
                 if pressed_keys[pygame.K_DOWN]:
-                    self.y += Game.ACTOR_SPEED * 6
+                    self.y += Game.ACTOR_SPEED
                 if pressed_keys[pygame.K_LEFT]:
-                    self.x -= Game.ACTOR_SPEED * 6
+                    self.x -= Game.ACTOR_SPEED
                 if pressed_keys[pygame.K_RIGHT]:
-                    self.x += Game.ACTOR_SPEED * 6                   
+                    self.x += Game.ACTOR_SPEED
+                    
+                #-----
 
+            
+                
+                
+                #------
                 if self.stunned < 0:
                     self.stunned = 0
                 if Game.food > 99 and Game.water > 99:
@@ -1796,7 +1804,7 @@ class Actor(pygame.sprite.Sprite):
                                 if random.random() <0.9:
                                     self.hitpoints = 10
                                 else:
-                                    Game.ACTOR_REGEN += 0.05
+                                    Game.ACTOR_REGEN += 0.3
                                     #print("congrats")
                             if event.key == pygame.K_p:
                                 for x in range(200):
@@ -1954,11 +1962,16 @@ class Actor2(pygame.sprite.Sprite):
             #Tile = 50*50
             x=int(self.pos[0]/50)
             y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            
             try:
                 char=Game.level[y][x]
             except:
                 char="?"
+
             return char
+         
+            
+            
             
         def update(self, seconds):
             #pressed_keys = pygame.key.get_pressed()
@@ -2038,7 +2051,7 @@ class Actor2(pygame.sprite.Sprite):
                 if self.stunned < 0:
                     self.stunned = 0
                 if self.hitpoints < self.hitpointsfull:
-                    self.hitpoints += Game.ACTOR_REGEN + 3.0            
+                    self.hitpoints += Game.ACTOR_REGEN + 5.0            
             if self.getChar()=="p":
                 self.hitpoints = 1
             
@@ -2534,8 +2547,7 @@ class Viewer(object):
                 self.actor1.y -= Game.ACTOR_SPEED*6
             if self.j.get_axis(1) > 0.2:
                 print("runter")
-                self.actor1.y += Game.ACTOR_SPEED*6
-
+                self.actor1.y += Game.ACTOR_SPEED*5
             if self.j.get_axis(0) < -0.2:
                 print("links") 
                 self.actor1.x -= Game.ACTOR_SPEED*6   
