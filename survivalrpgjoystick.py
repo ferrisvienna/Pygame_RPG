@@ -1623,8 +1623,8 @@ class Actor(pygame.sprite.Sprite):
             Actor.x = startpos[0]
             Actor.y = startpos[1]
             self.z = 0 # animationsnumber
-            self.magic = 1000
-            self.magicfull = 1000
+            self.magic = 1500
+            self.magicfull = 3000
             self.duration = 0.0 # how long was the current animation visible in seconds
             self.level=level
             self.nomove = False
@@ -1742,7 +1742,7 @@ class Actor(pygame.sprite.Sprite):
                 if self.hitpoints < 30:
                     self.magic-= 10
                 if self.magic < self.magicfull:
-                    self.magic += 20
+                    self.magic += 5
                 for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN:
                             if self.magic >= 50:
@@ -1753,7 +1753,7 @@ class Actor(pygame.sprite.Sprite):
                                     self.hitpoints -= 50
                                     self.magic -= 50
                                 print("3")
-                            if self.magic >= 200:
+                            if self.magic >= 400:
                                 if event.key == pygame.K_1:
                                     print("1")
                                     for x in range (100):
@@ -1765,7 +1765,8 @@ class Actor(pygame.sprite.Sprite):
                                         Explosion((self.x+75,self.y-75))
                                         Explosion((self.x+75,self.y+75))
                                         Explosion((self.x-75,self.y-75))
-                                    self.magic -= 200
+                                    self.magic -= 400
+                                    self.hitpoints -=1
                                 if event.key == pygame.K_6:
                                     for x in range(5):
                                         Porters((self.x-150,self.y))
@@ -1784,7 +1785,7 @@ class Actor(pygame.sprite.Sprite):
                                     self.hitpoints += self.hitpointsfull/2
                                     self.magic -= 400
                             if self.magic >= 400:
-                                if self.hitpoints > 200:
+                                if self.hitpoints > 300:
                                     if event.key == pygame.K_9:
                                         for x in range(20):
                                             Fireball((self.x,self.y))
