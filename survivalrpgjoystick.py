@@ -37,7 +37,7 @@ class Game(object):
     ACTOR_REGEN = 0.23
     ACTOR_ATKDMG = 10
     ACTOR_DEF = 0.5
-    ACTOR_SPEED = 3
+    ACTOR_SPEED = 0.5
     ACTOR_KB = 10
     ACTOR_LVL = 1
     KILLS = 0
@@ -544,7 +544,7 @@ class Porters(pygame.sprite.Sprite):
             self.rect.centery = round(self.pos[1],0)
 class Shoot(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
-        #boom = pygame.mixer.Sound(os.path.join('data','explosion.wav'))
+        boom = pygame.mixer.Sound(os.path.join('data','explosion.wav'))
 
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
@@ -695,7 +695,7 @@ class Flame (pygame.sprite.Sprite):
 
 class Msgboard (pygame.sprite.Sprite):
     images = []
-    #chain = pygame.mixer.Sound(os.path.join('data','levelup.wav'))  #load sound
+    chain = pygame.mixer.Sound(os.path.join('data','levelup.wav'))  #load sound
     images.append(pygame.image.load("data/sign.png"))
     #images.append(pygame.image.load("data/flamme2.png"))
     for img in images:
@@ -1604,7 +1604,7 @@ class Actor(pygame.sprite.Sprite):
         # not necessary:
         actors = {} # a dictionary of all monsters
         number = 0
-        #shoot = pygame.mixer.Sound(os.path.join('data','magic-missile-1.ogg'))  #load sound
+        shoot = pygame.mixer.Sound(os.path.join('data','magic-missile-1.ogg'))  #load sound
 
         def __init__(self, level, startpos=(700,100), hitpointsfull=600):
         #rebalance
@@ -1654,7 +1654,9 @@ class Actor(pygame.sprite.Sprite):
             Actor.actors[self.number] = self
             Healthbar(self)
             Magicbar(self)
-            
+        def spell(self):
+            print("Baller baller peng peng!")
+                
         def getChar(self):
             #Tile = 50*50
             x=int(self.pos[0]/50)
@@ -1664,14 +1666,6 @@ class Actor(pygame.sprite.Sprite):
             except:
                 char="?"
             return char
-        def Shoot(self):
-            if self.magic >= 50:
-                if event.key == pygame.K_3:
-                    for x in range(30):
-                        Explosion((self.x,self.y))
-                    self.x += 100
-                self.hitpoints -= 50
-                self.magic -= 50
             
         def update(self, seconds):
             pressed_keys = pygame.key.get_pressed()
@@ -1728,6 +1722,13 @@ class Actor(pygame.sprite.Sprite):
                     self.x -= Game.ACTOR_SPEED
                 if pressed_keys[pygame.K_RIGHT]:
                     self.x += Game.ACTOR_SPEED
+                    
+                #-----
+
+            
+                
+                
+                #------
                 if self.stunned < 0:
                     self.stunned = 0
                 if Game.food > 99 and Game.water > 99:
@@ -1908,7 +1909,7 @@ class Actor2(pygame.sprite.Sprite):
         actors2 = {} # a dictionary of all monsters
         number = 0
 
-        def __init__(self, level, startpos=(700,400), hitpointsfull=1500):
+        def __init__(self, level, startpos=(700,400), hitpointsfull=1000):
         #rebalance
 
             pygame.sprite.Sprite.__init__(self, self.groups ) #call parent class. NEVER FORGET !
@@ -2042,7 +2043,7 @@ class Actor2(pygame.sprite.Sprite):
                 if self.stunned < 0:
                     self.stunned = 0
                 if self.hitpoints < self.hitpointsfull:
-                    self.hitpoints += Game.ACTOR_REGEN + 1.5            
+                    self.hitpoints += Game.ACTOR_REGEN + 3.0            
             if self.getChar()=="p":
                 self.hitpoints = 1
             
@@ -2431,16 +2432,17 @@ class Viewer(object):
         Actor.groups = self.allgroup, self.actorgroup
         Actor2.groups = self.allgroup, self.actorgroup
         #Mouse.groups = self.allgroup, self.mousegroup
-        
         self.joystickcontrol = True
         if self.joystickcontrol:
             pygame.joystick.init()
             for stick in range(pygame.joystick.get_count()):
                 self.j = pygame.joystick.Joystick(stick)
                 self.j.init()
-                print(self.j.get_numhats())
-                print("joystick angeschlossen:  " + self.j.get_name())
-                
+                print("hut gefunden",self.j.get_numhats())
+                print("Joystick gefunden: " + self.j.get_name())
+        
+        
+        
         self.game = Game()
         
         
@@ -2505,19 +2507,14 @@ class Viewer(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    
                 elif event.type == pygame.JOYBUTTONDOWN:
-                     if self.j.get_button(0):
-                         self.actor1.Shoot()
-                
-                elif event.type  == pygame.JOYAXISMOTION:
-                           if self.j.get_axis(1) < -0.6:
-                               self.actor1.y-= Game.ACTOR_SPEED * 3
-                           if self.j.get_axis(1) > 0.6:
-                               self.actor1.y += Game.ACTOR_SPEED * 3
-                           if self.j.get_axis(0) < -0.6:
-                               print("huilinks")
-                           if self.j.get_axis(0) > 0.6:
-                               print("huirechts")
+                    if self.j.get_button(0):
+                        self.actor1.spell()
+                            
+                    
+                #elif event.type == pygame.JOYAXISMOTION:
+              
                 elif event.type == pygame.KEYDOWN:
                     #print("key down")
                     if event.key == pygame.K_ESCAPE:
@@ -2525,7 +2522,8 @@ class Viewer(object):
                     if event.key == pygame.K_p:
                        for pz in range (0,500):
                            Fragment((random.randint(0,1000),random.randint(0,350)))
-                               
+                           if self.j.get_axis(1):
+                              pass
                     #if event.key==pygame.K_F2:
                         #for px in range (0,5):
                         #    Security(self.game.level, hitpointsfull = 2000)
@@ -2535,6 +2533,21 @@ class Viewer(object):
                         #Actor.x +=50
                         #Actor.hitpoints -= 50
                     self.pressed_keys = pygame.key.get_pressed()
+            #-----------------------------
+            if self.j.get_axis(1) < -0.2:  
+                print("rauf")
+                self.actor1.y -= Game.ACTOR_SPEED*6
+            if self.j.get_axis(1) > 0.2:
+                print("runter")
+                self.actor1.y += Game.ACTOR_SPEED*5
+            if self.j.get_axis(0) < -0.2:
+                print("links") 
+                self.actor1.x -= Game.ACTOR_SPEED*6   
+            if self.j.get_axis(0) > 0.2:
+                print("rechts")
+                self.actor1.x += Game.ACTOR_SPEED*6  
+        
+            
             if Game.XP >= Game.ACTOR_NEEDEDXP:
                 #print("levelup")
                 Game.ACTOR_LVL += 1
