@@ -1138,15 +1138,15 @@ class EvilMagician(pygame.sprite.Sprite):  #DISCO GARY GLITTER
                       self.victimnumber = random.choice(list(Actor.actors.keys()))
                       self.victim = Actor.actors[self.victimnumber]
                       if self.victim.x > self.x:
-                         self.x += 1.5 
+                         self.x += 7 
                       if self.victim.x < self.x:
-                         self.x -= 1.5
+                         self.x -= 7
                       if self.victim.x == self.x:
                          self.x = self.x
                       if self.victim.y < self.y:
-                         self.y -= 1.5
+                         self.y -= 7
                       if self.victim.y > self.y:
-                         self.y += 1.5
+                         self.y += 7
                       if self.victim.y == self.y:
                          self.y = self.y
             elif len(Actor.actors) == 0:
@@ -2498,6 +2498,7 @@ class Viewer(object):
             #Rain((random.randint(0,Viewer.screenwidth),(random.randint(0,Viewer.screenwidth))))
         self.actor1=Actor((100,100))
         self.actor2=Actor2((300,400))
+        self.evilmagician=EvilMagician((100,100))
         #Mouse((100,100))
         self.watersymbol= Symbol(1, 200, 100)
         self.hungersymbol= Symbol(0, 100, 100)
