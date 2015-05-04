@@ -1654,8 +1654,20 @@ class Actor(pygame.sprite.Sprite):
             Actor.actors[self.number] = self
             Healthbar(self)
             Magicbar(self)
-        def spell(self):
-            print("Baller baller peng peng!")
+            
+        def Spell1(self):
+            if self.magic >= 200:
+               print("1")
+               for x in range (100):
+                    Explosion((self.x-100,self.y))
+                    Explosion((self.x+100,self.y))
+                    Explosion((self.x,self.y-100))
+                    Explosion((self.x,self.y+100))
+                    Explosion((self.x-75,self.y+75))
+                    Explosion((self.x+75,self.y-75))
+                    Explosion((self.x+75,self.y+75))
+                    Explosion((self.x-75,self.y-75))
+               self.magic -= 200
                 
         def getChar(self):
             #Tile = 50*50
@@ -1726,12 +1738,7 @@ class Actor(pygame.sprite.Sprite):
                 if pressed_keys[pygame.K_RIGHT]:
                     self.x += Game.ACTOR_SPEED
                     
-                #-----
 
-            
-                
-                
-                #------
                 if self.stunned < 0:
                     self.stunned = 0
                 if Game.food > 99 and Game.water > 99:
@@ -1755,16 +1762,17 @@ class Actor(pygame.sprite.Sprite):
                                 print("3")
                             if self.magic >= 200:
                                 if event.key == pygame.K_1:
-                                    print("1")
-                                    for x in range (100):
-                                        Explosion((self.x-100,self.y))
-                                        Explosion((self.x+100,self.y))
-                                        Explosion((self.x,self.y-100))
-                                        Explosion((self.x,self.y+100))
-                                        Explosion((self.x-75,self.y+75))
-                                        Explosion((self.x+75,self.y-75))
-                                        Explosion((self.x+75,self.y+75))
-                                        Explosion((self.x-75,self.y-75))
+                                    self.Spell1()
+                                    #~ print("1")
+                                    #~ for x in range (100):
+                                        #~ Explosion((self.x-100,self.y))
+                                        #~ Explosion((self.x+100,self.y))
+                                        #~ Explosion((self.x,self.y-100))
+                                        #~ Explosion((self.x,self.y+100))
+                                        #~ Explosion((self.x-75,self.y+75))
+                                        #~ Explosion((self.x+75,self.y-75))
+                                        #~ Explosion((self.x+75,self.y+75))
+                                        #~ Explosion((self.x-75,self.y-75))
                                     self.magic -= 200
                                 if event.key == pygame.K_6:
                                     for x in range(5):
@@ -2549,13 +2557,13 @@ class Viewer(object):
                 self.actor1.y -= Game.ACTOR_SPEED*6
             if self.j.get_axis(1) > 0.2:
                 print("runter")
-                self.actor1.y += Game.ACTOR_SPEED*5
+                self.actor1.y += Game.ACTOR_SPEED*6
             if self.j.get_axis(0) < -0.2:
                 print("links") 
                 self.actor1.x -= Game.ACTOR_SPEED*6   
             if self.j.get_axis(0) > 0.2:
                 print("rechts")
-                self.actor1.x += Game.ACTOR_SPEED*6  
+                self.actor1.x += Game.ACTOR_SPEED*6
         
             
             if Game.XP >= Game.ACTOR_NEEDEDXP:
