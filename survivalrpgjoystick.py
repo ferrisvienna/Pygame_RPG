@@ -1744,8 +1744,10 @@ class Actor(pygame.sprite.Sprite):
                                     self.x += 100
                                     self.hitpoints -= 50
                                     self.magic -= 50
+                                print("3")
                             if self.magic >= 200:
                                 if event.key == pygame.K_1:
+                                    print("1")
                                     for x in range (100):
                                         Explosion((self.x-100,self.y))
                                         Explosion((self.x+100,self.y))
