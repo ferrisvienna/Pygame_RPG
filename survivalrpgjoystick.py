@@ -23,14 +23,14 @@ pygame.init()
         
 
 class Game(object):
-    LIVES = 20
+    #LIVES = 20
     FORCE_OF_GRAVITY = 3
     ACTORSPEEDMAX = 20
     ACTORSPEEDMIN = 10
-    DISCTHROWERRANGE = 150
-    DISCMAXSPEED = 100
+    #DISCTHROWERRANGE = 150
+    #DISCMAXSPEED = 100
     SPAWNRATE = 0.005
-    SECURITYSPAWNRATE = 0.0000000005
+    SECURITYSPAWNRATE = 0.00
     SPAWNRATE2 = 0.005
     XP = 0.00
     ACTOR_NEEDEDXP = 300
@@ -184,9 +184,9 @@ class Game(object):
                      "ppppppppppppppppppppppppp",
                      "ddddddddggggggddddddddddd",
                      "gddddddgddddddgdddddddddd",
-                     "ddddddgdddddddgddddddddd",
+                     "ddddddgdddddddgdddddddddd",
                      "ddddgddddddddgddddddddddd",
-                     "ddddddddddddgdddddddddddd",
+                     "dddddddggggggdddddddddddd",
                      "dddddddddddgddddddddddddd",
                      "ddddddddddgdddddddddddddd",
                      "dddddddddgddddddddddddddd",
@@ -194,7 +194,7 @@ class Game(object):
                      "ddddddgdddddddddddddddddd",
                      "dddddgggggggggggggggddddd"],
                      
-                     ["ppppppppppppppppppppppppp",
+                     ["pppppppppppppppppppppppp",
                      "ppppppppppppppppppppepppp",
                      "ppppppppppppppppppppppppp",
                      "ddddddddddddggddddddddddd",
@@ -208,6 +208,7 @@ class Game(object):
                      "ddddddddgdddddddddddddddd",
                      "ddddddgdddddddddddddddddd",
                      "ddddddddddddddddggggggggg"]
+                     
                      
                      ]
               
@@ -746,6 +747,7 @@ class Plant(pygame.sprite.Sprite):
         self.rect.centerx = x
         self.rect.centery = y
         self.used = 0
+        self.radius = 30
         #self.collectingtime = 0
         #self.collectingtimefull = 0.1
     def update(self, seconds):
@@ -864,6 +866,7 @@ class Plant2(pygame.sprite.Sprite):
         self.rect.centerx = x
         self.rect.centery = y
         self.used = 0
+        self.radius = 30
     def update(self, seconds):
         #if self.collectingtime <=  self.collectingtimefull:
             #self.collectingtime += seconds
@@ -889,6 +892,7 @@ class Plant3(pygame.sprite.Sprite):
         self.rect.centerx = x
         self.rect.centery = y
         self.used = 0
+        self.radius = 30
     def update(self, seconds):
         #if self.collectingtime <=  self.collectingtimefull:
             #self.collectingtime += seconds
@@ -906,20 +910,26 @@ class Plant4(pygame.sprite.Sprite):
         #img.convert_alpha()
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self,self.groups)
-        self.image = random.choice(Plant3.images)
+        self.image = random.choice(Plant4.images)
         self.rect = self.image.get_rect()
         self.x  = x
         self.y  = y
         self.rect.centerx = x
         self.rect.centery = y
         self.used = 0
+        self.radius = 30
     def update(self, seconds):
         #if self.collectingtime <=  self.collectingtimefull:
             #self.collectingtime += seconds
         if self.used > 0:
             #if self.seconds > 1:
             self.kill()
-        pass        
+       
+       
+       
+       
+       
+             
 class Healthbar(pygame.sprite.Sprite):
     """shows a bar with the hitpoints of a Bird sprite"""
     def __init__(self, boss):
@@ -942,7 +952,7 @@ class Healthbar(pygame.sprite.Sprite):
         self.rect.centerx = self.boss.rect.centerx
         self.rect.centery = self.boss.rect.centery - self.boss.rect.height /2 - 10
         #check if boss is still alive if not
-        if self.boss.hitpoints<1:
+        if self.boss.hitpoints < 0:
          self.kill()
 
 
@@ -1161,15 +1171,15 @@ class EvilMagician(pygame.sprite.Sprite):  #DISCO GARY GLITTER
                       self.victimnumber = random.choice(list(Actor.actors.keys()))
                       self.victim = Actor.actors[self.victimnumber]
                       if self.victim.x > self.x:
-                         self.x += 7 
+                         self.x += 3
                       if self.victim.x < self.x:
-                         self.x -= 7
+                         self.x -= 3
                       if self.victim.x == self.x:
                          self.x = self.x
                       if self.victim.y < self.y:
-                         self.y -= 7
+                         self.y -= 3
                       if self.victim.y > self.y:
-                         self.y += 7
+                         self.y += 3
                       if self.victim.y == self.y:
                          self.y = self.y
             elif len(Actor.actors) == 0:
@@ -1634,7 +1644,6 @@ class Actor(pygame.sprite.Sprite):
 
             pygame.sprite.Sprite.__init__(self, self.groups ) #call parent class. NEVER FORGET !
             self.burntime = 0.0
-            
             #print("i bin do")
             self.plant = 0
             self.plant2 = 0
@@ -1643,6 +1652,7 @@ class Actor(pygame.sprite.Sprite):
             self.ill2 = 0
             self.ill3 = 0
             self.stunned = 0
+            self.alive = True            
             Actor.x = startpos[0]
             Actor.y = startpos[1]
             self.z = 0 # animationsnumber
@@ -1663,7 +1673,7 @@ class Actor(pygame.sprite.Sprite):
             self.hitpointsfull = float(hitpointsfull) # maximal hitpoints , float makes decimal
             self.hitpoints = float(hitpointsfull) # actual hitpoints
             self.rect = self.image.get_rect()
-            self.radius = max(self.rect.width, self.rect.height) / 2.0
+            self.radius = 5#min(self.rect.width, self.rect.height) / 2.0
             self.dx = 0
             self.dy = 0
             #self.regen = 0.5
@@ -1677,8 +1687,48 @@ class Actor(pygame.sprite.Sprite):
             Actor.actors[self.number] = self
             Healthbar(self)
             Magicbar(self)
-        def spell(self):
-            print("Baller baller peng peng!")
+            
+            
+#SpellSectionStart-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            
+        def spell1(self):
+            if self.alive:
+              for x in range (100):
+                Explosion((self.x-100,self.y))
+                Explosion((self.x+100,self.y))
+                Explosion((self.x,self.y-100))
+                Explosion((self.x,self.y+100))
+                Explosion((self.x-75,self.y+75))
+                Explosion((self.x+75,self.y-75))
+                Explosion((self.x+75,self.y+75))
+                Explosion((self.x-75,self.y-75))
+              self.magic -= 400
+              self.hitpoints -=1
+        
+        
+        def spell2(self):
+            if self.alive:
+              if self.magic >= 400:
+                Actor.shoot.play()
+                Shoot((self.x,self.y))
+                self.magic -= 300
+                print("shoot")
+
+        def spell3(self):
+            if self.alive:
+              if self.magic>300:
+                for x in range(200):
+                    Fireball((self.x- 300,self.y))
+                self.magic -= 300
+                
+                
+        def spell4(self):
+            if self.alive:
+              if self.hitpoints>300:
+                for x in range(200):
+                    Porters((self.x,self.y))
+                self.hitpoints -= 300
+
                 
         def getChar(self):
             #Tile = 50*50
@@ -1765,7 +1815,7 @@ class Actor(pygame.sprite.Sprite):
                 if self.hitpoints < 30:
                     self.magic-= 10
                 if self.magic < self.magicfull:
-                    self.magic += 5
+                    self.magic += 100
                 for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN:
                             if self.magic >= 50:
@@ -1776,29 +1826,25 @@ class Actor(pygame.sprite.Sprite):
                                     self.hitpoints -= 50
                                     self.magic -= 50
                                 print("3")
-                            if self.magic >= 400:
                                 if event.key == pygame.K_1:
-                                    print("1")
-                                    for x in range (100):
-                                        Explosion((self.x-100,self.y))
-                                        Explosion((self.x+100,self.y))
-                                        Explosion((self.x,self.y-100))
-                                        Explosion((self.x,self.y+100))
-                                        Explosion((self.x-75,self.y+75))
-                                        Explosion((self.x+75,self.y-75))
-                                        Explosion((self.x+75,self.y+75))
-                                        Explosion((self.x-75,self.y-75))
-                                    self.magic -= 400
-                                    self.hitpoints -=1
+                                     self.spell1()
+                                    #for x in range (100):
+                                        #Explosion((self.x-100,self.y))
+                                        #Explosion((self.x+100,self.y))
+                                        #Explosion((self.x,self.y-100))
+                                        #Explosion((self.x,self.y+100))
+                                        #Explosion((self.x-75,self.y+75))
+                                        #Explosion((self.x+75,self.y-75))
+                                        #Explosion((self.x+75,self.y+75))
+                                        #Explosion((self.x-75,self.y-75))
+                                    #self.magic -= 400
+                                    #self.hitpoints -=1
                                 if event.key == pygame.K_6:
                                     for x in range(5):
                                         Porters((self.x-150,self.y))
                             if self.magic >= 100:
                                 if event.key == pygame.K_2:
-                                    #for x in range (500):
-                                    Actor.shoot.play()
-                                    Shoot((self.x,self.y))
-                                    self.magic -= 300
+                                    self.spell2()
                                 if event.key == pygame.K_8:
                                     for x in range(200):
                                         Fireball((self.x- 300,self.y))
@@ -1864,8 +1910,11 @@ class Actor(pygame.sprite.Sprite):
                     Fragment((self.x,self.y))
                     #Monster.monsters[self.number] = None # kill Bird in sprite dictionary
             del(Actor.actors[self.number])
+            self.alive = False
             self.actors = {}
             pygame.sprite.Sprite.kill(self) # kill the actual Actor
+            self.x = 0
+            self.y = 0
 #class Mouse(pygame.sprite.Sprite):  
         #"""Generic Monster"""
         #images=[]  # list of all images
@@ -1973,6 +2022,7 @@ class Actor2(pygame.sprite.Sprite):
             self.radius = max(self.rect.width, self.rect.height) / 2.0
             self.dx = 0
             self.dy = 0
+            self.radius=5
             #self.regen = 0.5
             #self.dx = random.random()*10+20
             #self.dy= random.randint(-70,70)#rebalance
@@ -2456,6 +2506,7 @@ class Viewer(object):
         Plant.groups = self.allgroup, self.plantgroup
         Plant2.groups = self.allgroup, self.plant2group
         Plant3.groups = self.allgroup, self.plant3group
+        Plant4.groups = self.allgroup, self.plant4group
         Food.groups = self.allgroup, self.foodgroup
         Waterbottle.groups = self.allgroup, self.waterbottlegroup
         Healthbar.groups = self.allgroup, self.bargroup
@@ -2467,17 +2518,20 @@ class Viewer(object):
         Actor.groups = self.allgroup, self.actorgroup
         Actor2.groups = self.allgroup, self.actorgroup
         #Mouse.groups = self.allgroup, self.mousegroup
-        self.joystickcontrol = True
-        if self.joystickcontrol:
-            pygame.joystick.init()
-            for stick in range(pygame.joystick.get_count()):
+        self.joystickcontrol = False
+        try:
+             pygame.joystick.init()
+             for stick in range(pygame.joystick.get_count()):
                 self.j = pygame.joystick.Joystick(stick)
                 self.j.init()
                 print("hut gefunden",self.j.get_numhats())
                 print("Joystick gefunden: " + self.j.get_name())
-        
-        
-        
+                self.joystickcontrol=True
+        except:
+             self.joystickcontrol = False
+             print("no joystick connected")
+        #if self.joystickcontrol:
+
         self.game = Game()
         
         
@@ -2495,7 +2549,6 @@ class Viewer(object):
                x+=50
           y+=50
           x=0
-        
      def paint(self):
         # paint the level of self.game
         self.paint_level()
@@ -2515,7 +2568,7 @@ class Viewer(object):
             #Rain((random.randint(0,Viewer.screenwidth),(random.randint(0,Viewer.screenwidth))))
         self.actor1=Actor((100,100))
         self.actor2=Actor2((300,400))
-        self.evilmagician=EvilMagician((100,100))
+        #self.evilmagician=EvilMagician((100,100))
         #Mouse((100,100))
         self.watersymbol= Symbol(1, 200, 100)
         self.hungersymbol= Symbol(0, 100, 100)
@@ -2543,12 +2596,15 @@ class Viewer(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                    
-                elif event.type == pygame.JOYBUTTONDOWN:
+                elif self.joystickcontrol and event.type == pygame.JOYBUTTONDOWN:
                     if self.j.get_button(0):
-                        self.actor1.spell()
-                            
-                    
+                        self.actor1.spell1()
+                    if self.j.get_button(1):
+                        self.actor1.spell2()
+                    if self.j.get_button(2):
+                        self.actor1.spell3()
+                    if self.j.get_button(3):
+                        self.actor1.spell4()
                 #elif event.type == pygame.JOYAXISMOTION:
               
                 elif event.type == pygame.KEYDOWN:
@@ -2570,18 +2626,19 @@ class Viewer(object):
                         #Actor.hitpoints -= 50
                     self.pressed_keys = pygame.key.get_pressed()
             #-----------------------------
-            if self.j.get_axis(1) < -0.2:  
-                print("rauf")
-                self.actor1.y -= Game.ACTOR_SPEED*6
-            if self.j.get_axis(1) > 0.2:
-                print("runter")
-                self.actor1.y += Game.ACTOR_SPEED*5
-            if self.j.get_axis(0) < -0.2:
-                print("links") 
-                self.actor1.x -= Game.ACTOR_SPEED*6   
-            if self.j.get_axis(0) > 0.2:
-                print("rechts")
-                self.actor1.x += Game.ACTOR_SPEED*6  
+            if self.joystickcontrol:
+                if self.j.get_axis(1) < -0.2:  
+                    print("rauf")
+                    self.actor1.y -= Game.ACTOR_SPEED*6
+                if self.j.get_axis(1) > 0.2:
+                    print("runter")
+                    self.actor1.y += Game.ACTOR_SPEED*5
+                if self.j.get_axis(0) < -0.2:
+                    print("links") 
+                    self.actor1.x -= Game.ACTOR_SPEED*6   
+                if self.j.get_axis(0) > 0.2:
+                    print("rechts")
+                    self.actor1.x += Game.ACTOR_SPEED*6  
         
             
             if Game.XP >= Game.ACTOR_NEEDEDXP:
@@ -2663,8 +2720,8 @@ class Viewer(object):
             if random.random()<self.game.SPAWNRATE2:
                Monster2(self.game.level)
                
-            if random.random()<self.game.SECURITYSPAWNRATE:
-               Security(self.game.level)
+            #if random.random()<self.game.SECURITYSPAWNRATE:
+               #Security(self.game.level)
 
             if pygame.K_s in self.pressed_keys:
                 Actor(self.game.level)
@@ -2678,7 +2735,7 @@ class Viewer(object):
             if random.random() < 0.001:
                 Plant3(random.randint(20,975), random.randint(200, 600))
                 
-            if random.random() < 0.0003:
+            if random.random() < 0.03:
                 Plant4(random.randint(20,975), random.randint(200, 600))
 
             #if random.random() < 0.001:
@@ -2797,19 +2854,19 @@ class Viewer(object):
                 for mymagicbomber in crashgroup:
                       mymagicbomber.Boom = 1
             for myplant in self.plantgroup:
-                crashgroup = pygame.sprite.spritecollide(myplant, self.actorgroup, False)
+                crashgroup = pygame.sprite.spritecollide(myplant, self.actorgroup, False, pygame.sprite.collide_circle)
                 for myactor in crashgroup:
                       myactor.hitpoints += 100
                       Game.plant += 1
                       myplant.used = 1
             for myplant2 in self.plant2group:
-                crashgroup = pygame.sprite.spritecollide(myplant2, self.actorgroup, False)
+                crashgroup = pygame.sprite.spritecollide(myplant2, self.actorgroup, False, pygame.sprite.collide_circle)
                 for myactor in crashgroup:
                       myactor.hitpoints += 100
                       Game.plant2 += 1
                       myplant2.used = 1
             for myplant3 in self.plant3group:
-                crashgroup = pygame.sprite.spritecollide(myplant3, self.actorgroup, False)
+                crashgroup = pygame.sprite.spritecollide(myplant3, self.actorgroup, False, pygame.sprite.collide_circle)
                 for myactor in crashgroup:
                       myactor.hitpoints += 100
                       Game.plant3 += 1
@@ -2823,10 +2880,10 @@ class Viewer(object):
                 for myactor in crashgroup:
                       Game.water += 500
             for myactor in self.actorgroup:
-                crashgroup = pygame.sprite.spritecollide(myactor, self.plant4group, True)
-                for myactor in crashgroup:
-                      Game.hitpoints += 500
-          
+                crashgroup = pygame.sprite.spritecollide(myactor, self.plant4group, False, pygame.sprite.collide_circle)
+                for myplant in crashgroup:
+                      myactor.hitpoints += 500
+                      myplant.used = 1
             
 
 
