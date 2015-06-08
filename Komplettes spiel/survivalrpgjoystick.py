@@ -32,7 +32,7 @@ class Game(object):
     #DISCMAXSPEED = 100
     SPAWNRATE = 0.005
     SECURITYSPAWNRATE = 0.00
-    SPAWNRATE2 = 0.005
+    SPAWNRATE2 = 0.00
     XP = 0.00
     ACTOR_NEEDEDXP = 10
     ACTOR_REGEN = 0.75
@@ -292,8 +292,8 @@ class Rain(pygame.sprite.Sprite):
 class Jumptext(pygame.sprite.Sprite):
         """a fragment of an exploding Bird"""
         gravity = False # fragments fall down ?
-        def __init__(self, x=100,y=100, text="Ferris", color=(255,0,0),
-                    fontsize=12, sparkling = False, sparklecolor1=(255,1,1),
+        def __init__(self, x=100,y=100, text="MissingNo...", color=(255,0,0),
+                    size=12, sparkling = False, sparklecolor1=(255,1,1),
                     sparklecolor2 = (1,255,1),sparklecolor3=(1,1,255)):
             pygame.sprite.Sprite.__init__(self, self.groups)
             self.pos = [x,y]
@@ -301,7 +301,7 @@ class Jumptext(pygame.sprite.Sprite):
             self.y = y
             self.color = color
             self.text = text
-            self.fontsize = fontsize
+            self.fontsize = size
             self.sparkling = sparkling
             self.sparklecolor1=sparklecolor1
             self.sparklecolor2=sparklecolor2
@@ -1031,8 +1031,8 @@ class Healthbar(pygame.sprite.Sprite):
         self.rect.centerx = self.boss.rect.centerx
         self.rect.centery = self.boss.rect.centery - self.boss.rect.height /2 - 10
         #check if boss is still alive if not
-        if self.boss.hitpoints < 0:
-         self.kill()
+        if self.boss.hitpoints < 1:
+            self.kill()
 
 
 class Magicbar(pygame.sprite.Sprite):
@@ -1083,7 +1083,8 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             self.screenheight = Viewer.screenheight
             #startpos=(0,screen.get_rect().center[1])
             startpos=(20,random.randint(200,self.screenheight))
-            self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
+            self.x=float(startpos[0]) # dummy values to create a list
+            self.y=float(startpos[1])
             #self.pos[0] = float(startpos[0]) # float for more precise calculation
             #self.pos[1] = float(startpos[1])
            # self.area = screen.get_rect()
@@ -1095,22 +1096,26 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             self.radius = max(self.rect.width, self.rect.height) / 2.0
             self.dx= random.random()*10+20
             self.dy= random.randint(-70,70)#rebalance
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = self.x
+            self.rect.centery = self.y
             #--- not necessary:
             self.number = Monster.number # get my personal Birdnumber
             Monster.number+= 1           # increase the number for next Bird
-            Monster.monsters[self.number] = self #
+            Monster.monsters[self.number] = self
             Healthbar(self)
+            self.recentDamage = 0
+            self.recentDamageTimer = 5
+            
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=self.x/50
+            y=self.y/50 # correction value to get the tile under the feet doesn't actually work :\
             try:
                 char=self.level[y][x]
             except:
                 char="?"
             return char
+            
         def update(self, seconds):
             #------ check if lava
             #Animation#
@@ -1124,7 +1129,7 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
                     self.z = 0
                 self.image=Monster.images[self.z]
                 
-            if self.pos[0]> 1200:
+            if self.x> 1200:
                 self.hitpoints=0
            
             #-------
@@ -1142,23 +1147,23 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             self.dx= 20#random.randint(10,10)
             if self.nomove:
                 self.dx = 0
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             # -- check if Bird out of screen
             if not self.area.contains(self.rect):
                 #self.crashing = True # change colour later
                 # --- compare self.rect and area.rect
-                if self.pos[0] + self.rect.width/2 > self.area.right:
-                    self.pos[0] = self.area.right - self.rect.width/2
-                if self.pos[0] - self.rect.width/2 < self.area.left:
-                    self.pos[0] = self.area.left + self.rect.width/2
-                if self.pos[1] + self.rect.height/2 > self.area.bottom:
-                    self.pos[1] = self.area.bottom - self.rect.height/2
-                if self.pos[1] - self.rect.height/2 < self.area.top:
-                    self.pos[1] = self.area.top + self.rect.height/2
+                if self.x + self.rect.width/2 > self.area.right:
+                    self.x = self.area.right - self.rect.width/2
+                if self.x - self.rect.width/2 < self.area.left:
+                    self.x = self.area.left + self.rect.width/2
+                if self.y + self.rect.height/2 > self.area.bottom:
+                    self.y = self.area.bottom - self.rect.height/2
+                if self.y - self.rect.height/2 < self.area.top:
+                    self.y = self.area.top + self.rect.height/2
             #--- calculate new position on screen -----
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = self.x
+            self.rect.centery = self.y
             #--- loose hitpoins
             #if self.crashing:
              #self.hitpoints -=1
@@ -1168,12 +1173,26 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
                 # reduce burntime
                 self.burntime -= 0.4
                 Flame(self.rect.centerx, self.rect.centery)
+            if self.recentDamageTimer > 0:
+                self.recentDamageTimer-= seconds
+            if self.recentDamageTimer < 0:
+                self.recentDamageTimer = 5
+                if self.recentDamage>10:
+                    
+                    if random.random()>0.01:
+                        Jumptext(text=str(self.recentDamage*-1),color=(255,240,20),x=self.x,y=self.y, size = 20)
+                        self.recentDamage=0
+                    else:
+                        Jumptext(text="Critical"+str(self.recentDamage * -1),color=(255,0,0),size=20,x=self.x, y=self.y)
+                        self.hitpoints-=self.recentDamage
+                        self.recentDamage=0
             
             if self.hitpoints <= 0:
                 self.kill()
+                
         def kill(self):
             for _ in range(random.randint(7,20)):
-                    Fragment(self.pos)
+                    Fragment([self.x,self.y])
                     #Monster.monsters[self.number] = None # kill Bird in sprite dictionary
             del(Monster.monsters[self.number]) 
             pygame.sprite.Sprite.kill(self) # kill the actual Monster
@@ -1360,7 +1379,7 @@ class EvilMagician(pygame.sprite.Sprite):  #DISCO GARY GLITTER
 
         def kill(self):
             for _ in range(random.randint(7,20)):
-                    Fragment((self.x,self.y))
+                    Fragment([self.x,self.y])
                     #Monster.monsters[self.number] = None # kill Bird in sprite dictionary
             del(EvilMagician.evilmagicians[self.number]) 
             pygame.sprite.Sprite.kill(self) # kill the actual MonsteR
@@ -1368,9 +1387,9 @@ class EvilMagician(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             #print("kills:", Game.KILLS)
             Game.ACTOR_REGEN += 0.025
             if random.random() > 0.9:
-                Waterbottle(self.pos[0], self.pos[1])
+                Waterbottle(self.x, self.y)
             if random.random() > 0.9:
-                Food(self.pos[0], self.pos[1])
+                Food(self.x, self.y)
 
 class EvilMagician2(pygame.sprite.Sprite):  #DISCO GARY GLITTER
         images=[]  # list of all images
@@ -1833,11 +1852,14 @@ class Actor(pygame.sprite.Sprite):
             Game.actormagic = self.magic
             if random.random() < 0.0001:
                 self.ill = 300
+                Jumptext(self.x, self.y, "Got Illness1",(50,255,11), 20)
             if random.random() < 0.0005:
                 self.ill2 = 300
+                Jumptext(self.x, self.y, "Got Illness2",(50,255,11), 20)
             if random.random() < 0.0005:
                 self.ill3 = 300
                 self.stunned +=5
+                Jumptext(self.x, self.y, "Got Illness3, you Can't Move!",(50,255,11), 20)
             if self.ill > 0 and Game.plant > 0:
                 self.ill = 0
                 Game.plant -= 1
@@ -2271,6 +2293,8 @@ class Monster2(pygame.sprite.Sprite):
             Monster2.number2 += 1           # increase the number for next Bird
             Monster2.monsters2[self.number] = self #
             Healthbar(self)
+            self.recentDamage = 0
+            self.recentDamageTimer = 5
         def getChar(self):
             #Tile = 50*50
             x=int(self.pos[0]/50)
@@ -2354,7 +2378,16 @@ class Monster2(pygame.sprite.Sprite):
                 # reduce burntime
                 self.burntime -= 0.4
                 Flame(self.rect.centerx, self.rect.centery)
-            
+                
+            if self.recentDamageTimer > 0:
+                self.recentDamageTimer-= seconds
+            if self.recentDamageTimer == 0:
+                if self.recentDamage>10:
+                    Jumptext(text=self.recentDamage*-1,color=(255,20,20))
+                    if random.random()>0.01:
+                        Jumptext(text="Critical",color=(255,240,11))
+                        self.hitpoints-=self.recentDamage
+                    
             if self.hitpoints <= 0:
                 self.kill()
 
@@ -2893,7 +2926,7 @@ class Viewer(object):
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.actorgroup, False)
                 for myactor in crashgroup:
                       mymonster.hitpoints-= Game.ACTOR_ATKDMG
-                      mymonster.pos[0] -= 10
+                      mymonster.x -= 10
                       myactor.x += 10
                       myactor.magic += 1
                       myactor.hitpoints-=30.00 - Game.ACTOR_DEF
@@ -2906,6 +2939,7 @@ class Viewer(object):
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.explosiongroup, False)
                 for myexplosion in crashgroup:
                       mymonster.hitpoints-= 0.2 * Game.MAGIC_POWER
+                      mymonster.recentDamage += 0.2 * Game.MAGIC_POWER
             for mymonster in self.monstergroup:
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.portersgroup, False)
                 for myporters in crashgroup:
