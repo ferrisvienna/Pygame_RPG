@@ -18,7 +18,6 @@ import time as t
 #import easygui as e
 import os
 import menue
-
 pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer to avoid sound lag
 pygame.init()
         
@@ -32,7 +31,8 @@ class Game(object):
     #DISCMAXSPEED = 100
     SPAWNRATE = 0.005
     SECURITYSPAWNRATE = 0.00
-    SPAWNRATE2 = 0.00
+    SPAWNRATE2 = 0.
+    LIZARDSPAWNRATE = 0.05
     XP = 0.00
     ACTOR_NEEDEDXP = 10
     ACTOR_REGEN = 0.75
@@ -92,6 +92,17 @@ class Game(object):
         Monster2.images[3].convert_alpha()
         Monster2.images[4].convert_alpha()
         Monster2.images[5].convert_alpha()
+        
+        
+        Lizard.images.append(pygame.image.load("data/lizard1.png")) # 0
+        Lizard.images[0].set_colorkey((255,0,182))
+        Lizard.images.append(pygame.image.load("data/lizard2.png")) # 1
+        Lizard.images[1].set_colorkey((255,0,182))
+        Lizard.images.append(pygame.image.load("data/lizard3.png")) # 1
+        Lizard.images[2].set_colorkey((255,0,182))
+        Lizard.images[0].convert_alpha()
+        Lizard.images[1].convert_alpha()
+        Lizard.images[2].convert_alpha()
         
         Security.images.append(pygame.image.load("data/securitywa1.png")) # 0
         Security.images[0].set_colorkey((255,0,182))
@@ -210,7 +221,50 @@ class Game(object):
                      "ddddddgdddddddddddddddddd",
                      "ddddddddddddddddggggggggg"],
                      
+                     ["ppppppppppppppppppppppppp",
+                     "ppppppppppppppppppppepppp",
+                     "ppppppppppppppppppppppppp",
+                     "ddddddddddddggddddddddddd",
+                     "gdddddddddddddgddddggdddd",
+                     "dddddddddgdddddgdddggdddd",
+                     "dddddgdddgddggdddddggdddd",
+                     "dddddddddgddgddddddggdddd",
+                     "dddddddddgdgdddddddggdddd",
+                     "dddddddddggdddddddddddddd",
+                     "dddddgdddggdddddgddggdddd",
+                     "ddddddddgddddddddddggdddd",
+                     "ddddddgdddddddddddddddddd",
+                     "ddddddddddddddddggggggggg"],
+                     
+                     ["ppppppppppppppppppppppppp",
+                     "ppppppppppppppppppppepppp",
+                     "ppppppppppppppppppppppppp",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggggggggggggg"],
                   
+                    ["ppppppppppppppppppppppppp",
+                     "ppphppppppppppppppppepppp",
+                     "ppppppppppppppppppppppppp",
+                     "ggggggggggggggggggggggggg",
+                     "ggggggggggggggghggggggggg",
+                     "ggghgggggggggiggggggggggg",
+                     "ggggggggggggggggggggggggg",
+                     "ggdddgggdgggdggdddggggggg",
+                     "ggdggdggdgggdgdgggggggggg",
+                     "ggdddgggdgggdgdggdddggggg",
+                     "ggdggdggdgggdggdddgdggggg",
+                     "ggdddggggdddggghggggggggg",
+                     "gggggggggggggiggggggggggg",
+                     "gggggggggggggggggggghgggg"], 
                       ]
   
                 
@@ -248,8 +302,8 @@ class Rain(pygame.sprite.Sprite):
             pygame.sprite.Sprite.__init__(self, self.groups)
             #self.pos = [0.0,0.0]
             self.pos=[0,0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(0,30),random.randint(0,30),random.randint(100,250)), (5,5),
@@ -282,12 +336,12 @@ class Rain(pygame.sprite.Sprite):
             
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             if Fragment.gravity:
                 self.dy += Game.FORCE_OF_GRAVITY*2 # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 
 class Jumptext(pygame.sprite.Sprite):
         """a fragment of an exploding Bird"""
@@ -360,8 +414,8 @@ class Fragment(pygame.sprite.Sprite):
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
             self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(20,230),random.randint(20,230),random.randint(20,230)), (5,5),
@@ -393,20 +447,20 @@ class Fragment(pygame.sprite.Sprite):
             
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             if Fragment.gravity:
                 self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class IllFrag(pygame.sprite.Sprite):
         """a fragment of an exploding Bird"""
         gravity = True # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
             self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(20,100),random.randint(100,230),random.randint(20,50)), (5,5),
@@ -438,20 +492,20 @@ class IllFrag(pygame.sprite.Sprite):
             
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             if Fragment.gravity:
                 self.dy += Game.FORCE_OF_GRAVITY*2 # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class IllFrag2(pygame.sprite.Sprite):
         """a fragment of an exploding Bird"""
         gravity = True # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
             self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(20,255),random.randint(100,230),random.randint(20,100)), (5,5),
@@ -482,20 +536,20 @@ class IllFrag2(pygame.sprite.Sprite):
             self.image = self.get_alpha_surface(self.image0, self.a)
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             if Fragment.gravity:
                 self.dy += Game.FORCE_OF_GRAVITY*2 # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class IllFrag3(pygame.sprite.Sprite):
         """a fragment of an exploding Bird"""
         gravity = True # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
             self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(100,255),random.randint(0,20),random.randint(0,20)), (5,5),
@@ -527,26 +581,26 @@ class IllFrag3(pygame.sprite.Sprite):
 
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             if Fragment.gravity:
                 self.dy += Game.FORCE_OF_GRAVITY*2 # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
+                
 class Explosion(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
-            self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(200,255),random.randint(1,70),random.randint(1,70)), (5,5),
                                             random.randint(3,10))
             self.image = self.image.convert_alpha()
             self.rect = self.image.get_rect()
-            self.rect.center = self.pos #if you forget this line the sprite sit in the topleft corner
+            self.rect.center = self.x, self.y #if you forget this line the sprite sit in the topleft corner
             self.lifetime = 1 + random.random()*3 # max 6 seconds
             self.time = 0.0
             self.fragmentmaxspeed = 300  # try out other factors !
@@ -557,26 +611,25 @@ class Explosion(pygame.sprite.Sprite):
             self.time += seconds
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             #if Fragment.gravity:
                 #self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class Fireball(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
-            self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(200,255),random.randint(1,255),random.randint(1,10)), (5,5),
                                             random.randint(3,10))
             self.image = self.image.convert_alpha()
             self.rect = self.image.get_rect()
-            self.rect.center = self.pos #if you forget this line the sprite sit in the topleft corner
+            self.rect.center = self.x, self.y #if you forget this line the sprite sit in the topleft corner
             self.lifetime = 1 + random.random()*3 # max 6 seconds
             self.time = 0.0
             self.fragmentmaxspeed = 300  # try out other factors !
@@ -587,26 +640,25 @@ class Fireball(pygame.sprite.Sprite):
             self.time += seconds
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             #if Fragment.gravity:
                 #self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class Porters(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
-            self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(0,50),random.randint(100,255),random.randint(1,50)), (5,5),
                                             random.randint(3,10))
             self.image = self.image.convert_alpha()
             self.rect = self.image.get_rect()
-            self.rect.center = self.pos #if you forget this line the sprite sit in the topleft corner
+            self.rect.center = self.x,self.y #if you forget this line the sprite sit in the topleft corner
             self.lifetime = 1 + random.random()*4 # max 6 seconds
             self.time = 0.0
             self.fragmentmaxspeed = 200  # try out other factors !
@@ -617,12 +669,12 @@ class Porters(pygame.sprite.Sprite):
             self.time += seconds
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             #if Fragment.gravity:
                 #self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class Shoot(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         boom = pygame.mixer.Sound(os.path.join('data','explosion.wav'))
@@ -630,9 +682,8 @@ class Shoot(pygame.sprite.Sprite):
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
             #Viewer.shoot.play()
-            self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.explode = 0
             self.image = pygame.Surface((15,15))
             self.image.set_colorkey((0,0,0)) # black transparent
@@ -640,7 +691,7 @@ class Shoot(pygame.sprite.Sprite):
                                             random.randint(3,10))
             self.image = self.image.convert_alpha()
             self.rect = self.image.get_rect()
-            self.rect.center = self.pos #if you forget this line the sprite sit in the topleft corner
+            self.rect.center = self.x , self.y #if you forget this line the sprite sit in the topleft corner
             self.lifetime = 1 + random.random() * 2 # max 6 seconds
             self.time = 0.0
             self.dx = -500
@@ -651,26 +702,25 @@ class Shoot(pygame.sprite.Sprite):
             if self.time > self.lifetime:
                 Shoot.boom.play()
                 for x in range(300):
-                    Explosion((self.pos[0],self.pos[1]))
+                    Explosion((self.x,self.y))
                     self.kill()
             if self.explode > 0:
                 Shoot.boom.play()
                 for x in range(300):
-                    Explosion((self.pos[0],self.pos[1]))
+                    Explosion((self.x,self.y))
                     self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             #if Fragment.gravity:
                 #self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class E_Explosion(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
-            self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(200,255),random.randint(1,70),random.randint(1,70)), (5,5),
@@ -688,19 +738,18 @@ class E_Explosion(pygame.sprite.Sprite):
             self.time += seconds
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             #if Fragment.gravity:
                 #self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class E_Fireball(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
-            self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(200,255),random.randint(1,255),random.randint(1,10)), (5,5),
@@ -718,19 +767,18 @@ class E_Fireball(pygame.sprite.Sprite):
             self.time += seconds
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             #if Fragment.gravity:
                 #self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 class E_Porters(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         def __init__(self, pos):
             pygame.sprite.Sprite.__init__(self, self.groups)
-            self.pos = [0.0,0.0]
-            self.pos[0] = pos[0]
-            self.pos[1] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
             self.image = pygame.Surface((10,10))
             self.image.set_colorkey((0,0,0)) # black transparent
             pygame.draw.circle(self.image, (random.randint(0,50),random.randint(100,255),random.randint(1,50)), (5,5),
@@ -748,10 +796,10 @@ class E_Porters(pygame.sprite.Sprite):
             self.time += seconds
             if self.time > self.lifetime:
                 self.kill()
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
 
 class Flame (pygame.sprite.Sprite):
     images = []
@@ -1085,8 +1133,8 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             startpos=(20,random.randint(200,self.screenheight))
             self.x=float(startpos[0]) # dummy values to create a list
             self.y=float(startpos[1])
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
            # self.area = screen.get_rect()
             self.area = pygame.Rect(0, 0, Viewer.screenwidth, Viewer.screenheight)
             self.image = Monster.images[self.z]
@@ -1179,8 +1227,8 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
                 self.recentDamageTimer = 5
                 if self.recentDamage>10:
                     
-                    if random.random()>0.01:
-                        Jumptext(text=str(self.recentDamage*-1),color=(255,240,20),x=self.x,y=self.y, size = 20)
+                    if random.random()>0.1:
+                        Jumptext(text=str(round(self.recentDamage*-1,2)),color=(255,240,20),x=self.x,y=self.y, size = 20)
                         self.recentDamage=0
                     else:
                         Jumptext(text="Critical"+str(self.recentDamage * -1),color=(255,0,0),size=20,x=self.x, y=self.y)
@@ -1198,9 +1246,151 @@ class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             pygame.sprite.Sprite.kill(self) # kill the actual Monster
             Game.XP += 50
             if random.random() > 0.9:
-                Waterbottle(self.pos[0], self.pos[1])
+                Waterbottle(self.x, self.y)
             if random.random() > 0.9:
-                Food(self.pos[0], self.pos[1])
+                Food(self.x, self.y)
+                
+class Lizard(pygame.sprite.Sprite):  #Lizard man
+        """Generic Monster"""
+        images=[]  # list of all images
+        # not necessary:
+        lizards = {} # a dictionary of all monsters
+        numberlizard = 0
+
+        def __init__(self, level, startpos=(0,200), hitpointsfull=200):
+        #rebalance
+
+            pygame.sprite.Sprite.__init__(self, self.groups ) #call parent class. NEVER FORGET !
+            self.burntime = 0.0
+            self.z = 0 # animationsnumber
+            self.duration = 0.0 # how long was the current animation visible in seconds
+            self.level=level
+            #self.images=[]
+            self.nomove = False
+            self.screenwidth = Viewer.screenwidth
+            self.screenheight = Viewer.screenheight
+            #startpos=(0,screen.get_rect().center[1])
+            startpos=(20,random.randint(200,self.screenheight))
+            self.x=float(startpos[0]) # dummy values to create a list
+            self.y=float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
+           # self.area = screen.get_rect()
+            self.area = pygame.Rect(0, 0, Viewer.screenwidth, Viewer.screenheight)
+            self.image = Lizard.images[self.z]
+            self.hitpointsfull = float(hitpointsfull) # maximal hitpoints , float makes decimal
+            self.hitpoints = float(hitpointsfull) # actual hitpoints
+            self.rect = self.image.get_rect()
+            self.radius = max(self.rect.width, self.rect.height) / 2.0
+            self.dx= random.random()*10+20
+            self.dy= random.randint(-70,70)#rebalance
+            self.rect.centerx = self.x
+            self.rect.centery = self.y
+            #--- not necessary:
+            self.number = self.numberlizard # get my personal Birdnumber
+            Lizard.numberlizard+= 1           # increase the number for next Bird
+            Lizard.lizards[self.number] = self
+            Healthbar(self)
+            self.recentDamage = 0
+            self.recentDamageTimer = 5
+            
+        def getChar(self):
+            #Tile = 50*50
+            x=self.x/50
+            y=self.y/50 # correction value to get the tile under the feet doesn't actually work :\
+            try:
+                char=self.level[y][x]
+            except:
+                char="?"
+            return char
+            
+        def update(self, seconds):
+            #------ check if lava
+            #Animation#
+            # 6 bilder sind in Monster.images []
+            
+            self.duration += seconds
+            if self.duration > 0.5:
+                self.duration= 0
+                self.z  += 1
+                if self.z >= len(Lizard.images):
+                    self.z = 0
+                self.image=Lizard.images[self.z]
+                
+            if self.x> 1200:
+                self.hitpoints=0
+           
+            #-------
+            if self.getChar()=="g":
+                #self.hitpoints-=1
+                self.burntime += 2.0
+            #if self.getChar()=="?":
+                #self.hitpoints = 0
+            if self.getChar()=="e":
+                self.hitpoints = 0
+                Game.LIVES-=1
+            if self.getChar()=="h":
+                self.nomove = True
+            self.dy=random.randint(-10, 10)
+            self.dx= 20#random.randint(10,10)
+            if self.nomove:
+                self.dx = 0
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
+            # -- check if Bird out of screen
+            if not self.area.contains(self.rect):
+                #self.crashing = True # change colour later
+                # --- compare self.rect and area.rect
+                if self.x + self.rect.width/2 > self.area.right:
+                    self.x = self.area.right - self.rect.width/2
+                if self.x - self.rect.width/2 < self.area.left:
+                    self.x = self.area.left + self.rect.width/2
+                if self.y + self.rect.height/2 > self.area.bottom:
+                    self.y = self.area.bottom - self.rect.height/2
+                if self.y - self.rect.height/2 < self.area.top:
+                    self.y = self.area.top + self.rect.height/2
+            #--- calculate new position on screen -----
+            self.rect.centerx = self.x
+            self.rect.centery = self.y
+            #--- loose hitpoins
+            #if self.crashing:
+             #self.hitpoints -=1
+            
+            if self.burntime > 0 :
+                self.hitpoints -= 2.0
+                # reduce burntime
+                self.burntime -= 0.4
+                Flame(self.rect.centerx, self.rect.centery)
+            if self.recentDamageTimer > 0:
+                self.recentDamageTimer-= seconds
+            if self.recentDamageTimer < 0:
+                self.recentDamageTimer = 5
+                if self.recentDamage>10:
+                    
+                    if random.random()>0.01:
+                        Jumptext(text=str(round(self.recentDamage*-1,2)),color=(255,240,20),x=self.x,y=self.y, size = 20)
+                        self.recentDamage=0
+                    else:
+                        Jumptext(text="Critical"+str(self.recentDamage * -1),color=(255,0,0),size=20,x=self.x, y=self.y)
+                        self.hitpoints-=self.recentDamage
+                        self.recentDamage=0
+            
+            if self.hitpoints <= 0:
+                self.kill()
+                
+        def kill(self):
+            for _ in range(random.randint(7,20)):
+                    Fragment([self.x,self.y])
+                    #Monster.monsters[self.number] = None # kill Bird in sprite dictionary
+            pygame.sprite.Sprite.kill(self) # kill the actual Monster
+            Game.XP += 50
+            if random.random() > 0.9:
+                Waterbottle(self.x, self.y)
+            if random.random() > 0.6:
+                Food(self.x, self.y)
+            del(Lizard.lizards[self.number])
+            pygame.sprite.Sprite.kill(self)
+
 class EvilMagician(pygame.sprite.Sprite):  #DISCO GARY GLITTER
         images=[]  # list of all images
         # not necessary:
@@ -1229,8 +1419,8 @@ class EvilMagician(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             #startpos=(0,screen.get_rect().center[1])
             self.pos= startpos
             self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
             #self.area = screen.get_rect()
             self.area = pygame.Rect(0,100,1024,300)
             self.image = Monster.images[1]
@@ -1254,8 +1444,8 @@ class EvilMagician(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=int(self.x/50)
+            y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             try:
                 char=Game.level[y][x]
             except:
@@ -1419,8 +1609,8 @@ class EvilMagician2(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             #startpos=(0,screen.get_rect().center[1])
             self.pos= startpos
             self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
             #self.area = screen.get_rect()
             self.area = pygame.Rect(0,100,1024,300)
             self.image = Security.images[0]
@@ -1444,8 +1634,8 @@ class EvilMagician2(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=int(self.x/50)
+            y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             try:
                 char=Game.level[y][x]
             except:
@@ -1603,8 +1793,8 @@ class MagicBomber(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             #startpos=(0,screen.get_rect().center[1])
             self.pos= startpos
             self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
             #self.area = screen.get_rect()
             self.area = pygame.Rect(0,100,1024,300)
             self.image = Security.images[1]
@@ -1628,8 +1818,8 @@ class MagicBomber(pygame.sprite.Sprite):  #DISCO GARY GLITTER
             
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=int(self.x/50)
+            y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             try:
                 char=Game.level[y][x]
             except:
@@ -1762,9 +1952,10 @@ class Actor(pygame.sprite.Sprite):
             #self.stats{Game.ACTOR_ATKDMG : "Dmg",Game.ACTOR_SPEED : "speed", Game.ACTOR_DEF : "Def"}
             #startpos=(0,screen.get_rect().center[1])
             self.pos=startpos
-            self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            self.x = startpos[0]
+            self.y = startpos[1] # dummy values to create a list
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
             #self.area = screen.get_rect()
             self.area = pygame.Rect(0,100,1024,300)
             self.image = Security.images[0]
@@ -1831,8 +2022,8 @@ class Actor(pygame.sprite.Sprite):
                 
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=int(self.x/50)
+            y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             try:
                 char=Game.level[y][x]
             except:
@@ -2043,8 +2234,8 @@ class Actor(pygame.sprite.Sprite):
             ##startpos=(0,screen.get_rect().center[1])
             #self.pos=startpos
             #self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
             ##self.area = screen.get_rect()
             #self.area = pygame.Rect(0,100,1024,300)
             #self.image = Security.images[0]
@@ -2057,8 +2248,8 @@ class Actor(pygame.sprite.Sprite):
             ##self.regen = 0.5
             ##self.dx = random.random()*10+20
             ##self.dy= random.randint(-70,70)#rebalance
-            #self.rect.centerx = self.pos[0]
-            #self.rect.centery = self.pos[1]
+            #self.rect.centerx = self.x
+            #self.rect.centery = self.y
             ##--- not necessary:
             #self.number = Mouse.number # get my personal Birdnumber
             #Mouse.number+= 1
@@ -2066,8 +2257,8 @@ class Actor(pygame.sprite.Sprite):
 
         #def getChar(self):
             ##Tile = 50*50
-            #x=int(self.pos[0]/50)
-            #y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            #x=int(self.x/50)
+            #y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             #try:
                 #char=Game.level[y][x]
             #except:
@@ -2114,8 +2305,8 @@ class Actor2(pygame.sprite.Sprite):
             #startpos=(0,screen.get_rect().center[1])
             self.pos=startpos
             self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
             #self.area = screen.get_rect()
             self.area = pygame.Rect(0,100,1024,300)
             self.image = Security.images[1]
@@ -2139,8 +2330,8 @@ class Actor2(pygame.sprite.Sprite):
             
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=int(self.x/50)
+            y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             
             try:
                 char=Game.level[y][x]
@@ -2274,9 +2465,10 @@ class Monster2(pygame.sprite.Sprite):
             self.nomove = False
             #startpos=(0,screen.get_rect().center[1])
             startpos2=(20,random.randint(200,600))
-            self.pos = [float(startpos2[0]),float (startpos2[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            self.x = startpos2[0]
+            self.y = startpos2[1]
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
            # self.area = screen.get_rect()
             self.area = pygame.Rect(0, 0,  Viewer.screenwidth, Viewer.screenheight)
             self.image = Monster2.images[self.z]
@@ -2286,8 +2478,8 @@ class Monster2(pygame.sprite.Sprite):
             self.radius = max(self.rect.width, self.rect.height) / 2.0
             self.dx= random.random()*10+20
             self.dy= random.randint(-70,70)#rebalance
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
             #--- not necessary:
             self.number = Monster2.number2 # get my personal Birdnumber
             Monster2.number2 += 1           # increase the number for next Bird
@@ -2297,8 +2489,8 @@ class Monster2(pygame.sprite.Sprite):
             self.recentDamageTimer = 5
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=int(self.x/50)
+            y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             try:
                 char=self.level[y][x]
             except:
@@ -2320,7 +2512,7 @@ class Monster2(pygame.sprite.Sprite):
                 self.image=Monster2.images[self.z]
 
 
-            if self.pos[0]>1200:
+            if self.x>1200:
                 self.hitpoints=0
            
             #-------
@@ -2328,7 +2520,7 @@ class Monster2(pygame.sprite.Sprite):
                 self.hitpoints-= 0.5 #lava?
                 self.burntime += 1.0
             if self.getChar()=="?":
-                self.hitpoints=self.pos[0]
+                self.hitpoints=self.x
             if self.getChar()=="e":
                 self.hitpoints=1
                 Game.LIVES-=1
@@ -2340,13 +2532,13 @@ class Monster2(pygame.sprite.Sprite):
                       #print(len(Actor.actors))
                       self.victimnumber = random.choice(list(Actor.actors.keys()))
                       self.victim = Actor.actors[self.victimnumber]
-                      if self.victim.x > self.pos[0]:
-                        if self.victim.y < self.pos[1]:
-                            self.pos[1]-=0.1
-                        if self.victim.y > self.pos[1]:
-                            self.pos[1]+=0.1
-                        if self.victim.y == self.pos[1]:
-                            self.pos[1]=self.pos[1]
+                      if self.victim.x > self.x:
+                        if self.victim.y < self.y:
+                            self.y-=0.1
+                        if self.victim.y > self.y:
+                            self.y+=0.1
+                        if self.victim.y == self.y:
+                            self.y=self.y
                         
             elif(Actor.actors) == 0:
                 self.dy = random.randint(-20,20)
@@ -2354,23 +2546,23 @@ class Monster2(pygame.sprite.Sprite):
             self.dx= 50
             if self.nomove:
                 self.dx = 0
-            self.pos[0] += self.dx * seconds
-            #self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            #self.y += self.dy * seconds
             # -- check if monster is on screen
             if not self.area.contains(self.rect):
                 
                 # --- compare self.rect and area.rect
-                if self.pos[0] + self.rect.width/2 > self.area.right:
-                    self.pos[0] = self.area.right - self.rect.width/2
-                if self.pos[0] - self.rect.width/2 < self.area.left:
-                    self.pos[0] = self.area.left + self.rect.width/2
-                if self.pos[1] + self.rect.height/2 > self.area.bottom:
-                    self.pos[1] = self.area.bottom - self.rect.height/2
-                if self.pos[1] - self.rect.height/2 < self.area.top:
-                    self.pos[1] = self.area.top + self.rect.height/2
+                if self.x + self.rect.width/2 > self.area.right:
+                    self.x = self.area.right - self.rect.width/2
+                if self.x - self.rect.width/2 < self.area.left:
+                    self.x = self.area.left + self.rect.width/2
+                if self.y + self.rect.height/2 > self.area.bottom:
+                    self.y = self.area.bottom - self.rect.height/2
+                if self.y - self.rect.height/2 < self.area.top:
+                    self.y = self.area.top + self.rect.height/2
             #--- calculate new position on screen -----
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
             #--- loose hitpoints
             
             if self.burntime > 0 :
@@ -2394,15 +2586,15 @@ class Monster2(pygame.sprite.Sprite):
 
         def kill(self):
             for _ in range(random.randint(7,20)):
-                    Fragment(self.pos)
+                    Fragment((self.x,self.y))
                     #Monster.monsters[self.number] = None # kill Bird in sprite dictionary
             del(Monster2.monsters2[self.number]) 
             pygame.sprite.Sprite.kill(self) # kill the actual Monster
             Game.XP += 50
             if random.random() > 0.9:
-                Waterbottle(self.pos[0], self.pos[1])
+                Waterbottle(self.x, self.y)
             if random.random() > 0.9:
-                Food(self.pos[0], self.pos[1])
+                Food(self.x, self.y)
             #print("i died")
 
    
@@ -2427,8 +2619,8 @@ class Security(pygame.sprite.Sprite):
             #startpos=(0,screen.get_rect().center[1])
             startpos=(Viewer.screenwidth,random.randint(100,350))
             self.pos = [float(startpos[0]),float (startpos[1])] # dummy values to create a list
-            #self.pos[0] = float(startpos[0]) # float for more precise calculation
-            #self.pos[1] = float(startpos[1])
+            #self.x = float(startpos[0]) # float for more precise calculation
+            #self.y = float(startpos[1])
            # self.area = screen.get_rect()
             self.area = pygame.Rect(0,100,1024,300)
             self.image = Security.images[self.z]
@@ -2438,8 +2630,8 @@ class Security(pygame.sprite.Sprite):
             self.radius = max(self.rect.width, self.rect.height) / 2.0
             self.dx= random.random()*-10+20
             self.dy= random.randint(-70,70)
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
             #--- not necessary:
             self.taser = False
             self.number = Security.number # get my personal Birdnumber
@@ -2455,8 +2647,8 @@ class Security(pygame.sprite.Sprite):
             #self.dy = random.random() * ACTORSPEEDMAX * speedrandom + speedrandom
         def getChar(self):
             #Tile = 50*50
-            x=int(self.pos[0]/50)
-            y=int(self.pos[1]/50)+0 # correction value to get the tile under the feet doesn't actually work :\
+            x=int(self.x/50)
+            y=int(self.y/50)+0 # correction value to get the tile under the feet doesn't actually work :\
             try:
                 char=self.level[y][x]
             except:
@@ -2496,26 +2688,26 @@ class Security(pygame.sprite.Sprite):
             self.dx= -25#random.randint(10,10)
             if self.nomove:
                 self.dx = 0
-            self.pos[0] += self.dx * seconds
-            self.pos[1] += self.dy * seconds
+            self.x += self.dx * seconds
+            self.y += self.dy * seconds
             # -- check if Bird out of screen
             if not self.area.contains(self.rect):
                 #self.crashing = True # change colour later
                 # --- compare self.rect and area.rect
-                if self.pos[0] + self.rect.width/2 > self.area.right:
-                    self.pos[0] = self.area.right - self.rect.width/2
-                if self.pos[0] - self.rect.width/2 < self.area.left:
-                    self.pos[0] = self.area.left + self.rect.width/2
-                if self.pos[1] + self.rect.height/2 > self.area.bottom:
-                    self.pos[1] = self.area.bottom - self.rect.height/2
-                if self.pos[1] - self.rect.height/2 < self.area.top:
-                    self.pos[1] = self.area.top + self.rect.height/2
+                if self.x + self.rect.width/2 > self.area.right:
+                    self.x = self.area.right - self.rect.width/2
+                if self.x - self.rect.width/2 < self.area.left:
+                    self.x = self.area.left + self.rect.width/2
+                if self.y + self.rect.height/2 > self.area.bottom:
+                    self.y = self.area.bottom - self.rect.height/2
+                if self.y - self.rect.height/2 < self.area.top:
+                    self.y = self.area.top + self.rect.height/2
                 #self.newspeed() # calculate a new direction
             #--- calculate actual image: crasing, catched, both, nothing ?
             #self.image = Bird.image[self.crashing + self.catched*2]
             #--- calculate new position on screen -----
-            self.rect.centerx = round(self.pos[0],0)
-            self.rect.centery = round(self.pos[1],0)
+            self.rect.centerx = round(self.x,0)
+            self.rect.centery = round(self.y,0)
             #--- loose hitpoins
             #if self.crashing:
              #self.hitpoints -=1
@@ -2584,6 +2776,7 @@ class Viewer(object):
         self.symbolgroup = pygame.sprite.Group()
         self.raingroup = pygame.sprite.Group()
         self.allgroup = pygame.sprite.LayeredUpdates()
+        self.lizardgroup = pygame.sprite.Group()
         self.monstergroup=pygame.sprite.Group()
         self.evilmagiciangroup = pygame.sprite.Group()
         self.evilmagiciangroup2 = pygame.sprite.Group()
@@ -2598,7 +2791,8 @@ class Viewer(object):
         #self.securitygroup= pygame.sprite.Group()
         self.actorgroup = pygame.sprite.Group()
         self.jumptextgroup = pygame.sprite.Group()
-
+        
+        Lizard.groups = self.allgroup, self.lizardgroup, self.monstergroup
         Monster.groups = self.allgroup, self.monstergroup
         Monster2.groups =  self.allgroup, self.monstergroup
         EvilMagician.groups =  self.allgroup, self.monstergroup, self.evilmagiciangroup
@@ -2767,6 +2961,7 @@ class Viewer(object):
                     self.game.level_nr -= 1
                     Game.SPAWNRATE = 0.15 # finale furioso
                     Game.SPAWNRATE2 = 0.15
+                    Game.LIZARDSPAWNRATE = 0.15
                     Game.SECURITYSPAWNRATE = 0.15
                 else:    
                     self.game.level = self.game.levels[self.game.level_nr]
@@ -2838,6 +3033,9 @@ class Viewer(object):
             if random.random()<self.game.SPAWNRATE2:
                Monster2(self.game.level)
                
+            if random.random()<self.game.LIZARDSPAWNRATE:
+                Lizard(self.game.level)
+                   
             #if random.random()<self.game.SECURITYSPAWNRATE:
                #Security(self.game.level)
 
@@ -2943,7 +3141,7 @@ class Viewer(object):
             for mymonster in self.monstergroup:
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.portersgroup, False)
                 for myporters in crashgroup:
-                      mymonster.pos[0] = 0
+                      mymonster.x = 0
             for mymonster in self.monstergroup:
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.fballgroup, False)
                 for myporters in crashgroup:
