@@ -49,8 +49,8 @@ class Game(object):
     plant2 = 0
     plant3 = 0
     plant4 = 0
-    water = 500
-    food = 500
+    water = 100
+    food = 100
     
 #rebalance
     def __init__(self):
@@ -568,7 +568,7 @@ class IllFrag3(pygame.sprite.Sprite):
         def get_alpha_surface( self, surf, alpha=128, red=128, green=128, blue=128, mode=pygame.BLEND_RGBA_MULT):
          
             tmp = pygame.Surface( surf.get_size(), pygame.SRCALPHA, 32)
-            tmp.fill( (red,green,blue,alpha) )
+            tmp.fill( (red,green,blue,alpha))
             tmp.blit(surf, (0,0), surf.get_rect(), mode)
             return tmp
 
@@ -645,7 +645,7 @@ class Fireball(pygame.sprite.Sprite):
             #if Fragment.gravity:
                 #self.dy += Game.FORCE_OF_GRAVITY # gravity suck fragments down
             self.rect.centerx = round(self.x,0)
-            self.rect.centery = round(self.y,0)
+            self.rect.centery = round(self.y,0)                
 class Porters(pygame.sprite.Sprite):
         gravity = False # fragments fall down ?
         def __init__(self, pos):
@@ -1109,8 +1109,8 @@ class Magicbar(pygame.sprite.Sprite):
          self.boss.hitpoints -= 0.5
         if self.boss.hitpoints <= 0:
             self.kill()
-
-
+            
+            
 class Monster(pygame.sprite.Sprite):  #DISCO GARY GLITTER
         """Generic Monster"""
         images=[]  # list of all images
@@ -1929,7 +1929,7 @@ class Actor(pygame.sprite.Sprite):
 
         def __init__(self, level, startpos=(700,100), hitpointsfull=1000):
         #rebalance
-
+            self.lightning=0.0
             pygame.sprite.Sprite.__init__(self, self.groups ) #call parent class. NEVER FORGET !
             self.burntime = 0.0
             #print("i bin do")
@@ -2034,6 +2034,8 @@ class Actor(pygame.sprite.Sprite):
 
             
         def update(self, seconds):
+            if self.lightning>0:
+                self.lightning-=seconds
             pressed_keys = pygame.key.get_pressed()
             self.rect.centerx = self.x
             self.rect.centery = self.y
@@ -2083,15 +2085,6 @@ class Actor(pygame.sprite.Sprite):
                 self.ill3 -= 0.01
             if self.stunned > 0:
                 self.stunned -= seconds
-            if self.stunned < 1:
-                if pressed_keys[pygame.K_UP]:
-                    self.y -= Game.ACTORSPEEDMAX
-                if pressed_keys[pygame.K_DOWN]:
-                    self.y += Game.ACTORSPEEDMAX
-                if pressed_keys[pygame.K_LEFT]:
-                    self.x -= Game.ACTORSPEEDMAX
-                if pressed_keys[pygame.K_RIGHT]:
-                    self.x += Game.ACTORSPEEDMAX
                     
                 #-----
 
@@ -2150,7 +2143,7 @@ class Actor(pygame.sprite.Sprite):
                             if self.magic >= 400:
                                 if self.hitpoints > 300:
                                     if event.key == pygame.K_9:
-                                        for x in range(20):
+                                        for x in range(20d0):
                                             Fireball((self.x,self.y))
                                             Explosion((self.x,self.y))
                                             Porters((self.x,self.y))
@@ -2175,9 +2168,7 @@ class Actor(pygame.sprite.Sprite):
                             if event.key == pygame.K_p:
                                 for x in range(200):
                                     Fragment((random.randint(0,1000),random.randint(0,350)))
-                            if event.key == pygame.K_h:
-                                self.hitpoints = self.hitpointsfull
-                                self.magic = self.magicfull
+                                    
             #self.mouse=pygame.mouse.get_pos()
             
             #self.x=self.mouse[0] 
@@ -2924,7 +2915,7 @@ class Viewer(object):
                         running = False
                         #menue.Viewer().run()
                     if event.key == pygame.K_p:
-                       for pz in range (0,500):
+                       for pz in range(0,500):
                            Fragment((random.randint(0,1000),random.randint(0,350)))
                            if self.j.get_axis(1):
                               pass
@@ -2936,8 +2927,21 @@ class Viewer(object):
                     #if event.key == pygame.K_p:
                         #Actor.x +=50
                         #Actor.hitpoints -= 50
-                    self.pressed_keys = pygame.key.get_pressed()
-            #-----------------------------
+            self.pressed_keys = pygame.key.get_pressed()
+            #-----------------------------Keyboard control--------------------------------------------------
+            #===============================================================================================
+            #-----------------------------------------------------------------------------------------------
+            
+            if self.actor1.stunned < 1:
+                if self.pressed_keys[pygame.K_UP]:
+                    self.actor1.y -= Game.ACTORSPEEDMAX
+                if self.pressed_keys[pygame.K_DOWN]:
+                    self.actor1.y += Game.ACTORSPEEDMAX
+                if self.pressed_keys[pygame.K_LEFT]:
+                    self.actor1.x -= Game.ACTORSPEEDMAX
+                if self.pressed_keys[pygame.K_RIGHT]:
+                    self.actor1.x += Game.ACTORSPEEDMAX
+                    
             if self.joystickcontrol:
                 if self.j.get_axis(1) < -0.2:  
                     print("rauf")
@@ -2946,11 +2950,13 @@ class Viewer(object):
                     print("runter")
                     self.actor1.y += Game.ACTOR_SPEED*5
                 if self.j.get_axis(0) < -0.2:
-                    print("links") 
+                    print("links")
                     self.actor1.x -= Game.ACTOR_SPEED*6   
                 if self.j.get_axis(0) > 0.2:
                     print("rechts")
                     self.actor1.x += Game.ACTOR_SPEED*6  
+                    
+                
         
             
             if Game.XP >= Game.ACTOR_NEEDEDXP:
@@ -3057,8 +3063,8 @@ class Viewer(object):
             #if random.random() < 0.001:
                 #for x in range(50):
                     #Rain(random.randint(0,975),0)
-            Game.food -= 0.05
-            Game.water -= 0.05
+            Game.food -= 0.10
+            Game.water -= 0.10
             
             #if len(EvilMagician.evilmagicians) + len(EvilMagician2.evilmagicians2) < 1:
                 #magician = random.random()
@@ -3124,6 +3130,7 @@ class Viewer(object):
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.actorgroup, False)
                 for myactor in crashgroup:
                       mymonster.hitpoints-= Game.ACTOR_ATKDMG
+                      mymonster.recentDamage += Game.ACTOR_ATKDMG
                       mymonster.x -= 10
                       myactor.x += 10
                       myactor.magic += 1
@@ -3150,6 +3157,7 @@ class Viewer(object):
                 crashgroup = pygame.sprite.spritecollide(myshoot, self.monstergroup, False)
                 for mymonster in crashgroup:
                       myshoot.explode = 1
+                      mymonster.hitpoints -=10
             for myactor in self.actorgroup:
                 crashgroup = pygame.sprite.spritecollide(myactor, self.e_explosiongroup, False)
                 for mye_explosion in crashgroup:
@@ -3191,15 +3199,15 @@ class Viewer(object):
             for myactor in self.actorgroup:
                 crashgroup = pygame.sprite.spritecollide(myactor, self.foodgroup, True)
                 for myactor in crashgroup:
-                      Game.food += 500
+                      Game.food += 2
             for myactor in self.actorgroup:
                 crashgroup = pygame.sprite.spritecollide(myactor, self.waterbottlegroup, True)
                 for myactor in crashgroup:
-                      Game.water += 500
+                      Game.water += 2
             for myactor in self.actorgroup:
                 crashgroup = pygame.sprite.spritecollide(myactor, self.plant4group, False, pygame.sprite.collide_circle)
                 for myplant in crashgroup:
-                      myactor.hitpoints += 500
+                      myactor.hitpoints += 100
                       myplant.used = 1
             
 
