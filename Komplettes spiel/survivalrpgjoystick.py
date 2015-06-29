@@ -1944,7 +1944,7 @@ class Actor(pygame.sprite.Sprite):
             Actor.x = startpos[0]
             Actor.y = startpos[1]
             self.z = 0 # animationsnumber
-            self.magic = 1500
+            self.magic = 3000
             self.magicfull = 3000
             self.duration = 0.0 # how long was the current animation visible in seconds
             self.level=level
@@ -1962,7 +1962,7 @@ class Actor(pygame.sprite.Sprite):
             self.hitpointsfull = float(hitpointsfull) # maximal hitpoints , float makes decimal
             self.hitpoints = float(hitpointsfull) # actual hitpoints
             self.rect = self.image.get_rect()
-            self.radius = 5#min(self.rect.width, self.rect.height) / 2.0
+            self.radius = 5 #min(self.rect.width, self.rect.height) / 2.0
             self.dx = 0
             self.dy = 0
             #self.regen = 0.5
@@ -1972,7 +1972,7 @@ class Actor(pygame.sprite.Sprite):
             self.rect.centery = self.y
             #--- not necessary:
             self.number = Actor.number # get my personal Birdnumber
-            Actor.number+= 1           
+            Actor.number+= 1
             Actor.actors[self.number] = self
             Healthbar(self)
             Magicbar(self)
@@ -2018,8 +2018,35 @@ class Actor(pygame.sprite.Sprite):
                 for x in range(200):
                     Porters((self.x,self.y))
                 self.hitpoints -= 300
-
                 
+        def spell5(self):
+         if self.alive:
+            for x in range(20):
+                Porters((self.x,self.y))
+        
+        def spell6(self):
+          if self.alive:
+            if self.hitpoints > 500:
+                for x in range(3000):
+                    Explosion((self.x,self.y))
+                self.hitpoints -= 500
+        
+        def spell7(self):
+         if self.alive:
+          if self.magic >= 50:
+            for x in range(30):
+                Explosion((self.x,self.y))
+            self.x += 100
+            self.hitpoints -= 50
+            self.magic -= 50
+            
+        def spell8(self):
+            if self.alive:
+             pass
+        def spell9(self):
+            pass
+        def spell10(self):
+            pass
         def getChar(self):
             #Tile = 50*50
             x=int(self.x/50)
@@ -2094,7 +2121,7 @@ class Actor(pygame.sprite.Sprite):
                 #------
                 if self.stunned < 0:
                     self.stunned = 0
-                if Game.food > 99 and Game.water > 99:
+                if Game.food > 10 and Game.water > 10:
                     if self.hitpoints < self.hitpointsfull:
                         self.hitpoints+= Game.ACTOR_REGEN
                 if self.hitpoints > self.hitpointsfull:
@@ -2102,33 +2129,16 @@ class Actor(pygame.sprite.Sprite):
                 if self.hitpoints < 30:
                     self.magic-= 10
                 if self.magic < self.magicfull:
-                    self.magic += 100
+                    self.magic += 10000
                 for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN:
                             if self.magic >= 50:
                                 if event.key == pygame.K_3:
-                                    for x in range(30):
-                                        Explosion((self.x,self.y))
-                                    self.x += 100
-                                    self.hitpoints -= 50
-                                    self.magic -= 50
-                                print("3")
+                                    self.spell7()
                                 if event.key == pygame.K_1:
                                      self.spell1()
-                                    #for x in range (100):
-                                        #Explosion((self.x-100,self.y))
-                                        #Explosion((self.x+100,self.y))
-                                        #Explosion((self.x,self.y-100))
-                                        #Explosion((self.x,self.y+100))
-                                        #Explosion((self.x-75,self.y+75))
-                                        #Explosion((self.x+75,self.y-75))
-                                        #Explosion((self.x+75,self.y+75))
-                                        #Explosion((self.x-75,self.y-75))
-                                    #self.magic -= 400
-                                    #self.hitpoints -=1
                                 if event.key == pygame.K_6:
-                                    for x in range(5):
-                                        Porters((self.x-150,self.y))
+                                    self.spell5()
                             if self.magic >= 100:
                                 if event.key == pygame.K_2:
                                     self.spell2()
@@ -2143,7 +2153,7 @@ class Actor(pygame.sprite.Sprite):
                             if self.magic >= 400:
                                 if self.hitpoints > 300:
                                     if event.key == pygame.K_9:
-                                        for x in range(20d0):
+                                        for x in range(20):
                                             Fireball((self.x,self.y))
                                             Explosion((self.x,self.y))
                                             Porters((self.x,self.y))
@@ -2151,9 +2161,7 @@ class Actor(pygame.sprite.Sprite):
                                         self.hitpoints -= 200
                             if self.hitpoints > 500:
                                 if event.key == pygame.K_5:
-                                    for x in range(3000):
-                                        Explosion((self.x,self.y))
-                                    self.hitpoints -= 500
+                                    self.spell6()
                             if self.hitpoints > 300:
                                 if event.key == pygame.K_7:
                                     for x in range(200):
@@ -2165,9 +2173,6 @@ class Actor(pygame.sprite.Sprite):
                                 else:
                                     Game.ACTOR_REGEN += 0.3
                                     #print("congrats")
-                            if event.key == pygame.K_p:
-                                for x in range(200):
-                                    Fragment((random.randint(0,1000),random.randint(0,350)))
                                     
             #self.mouse=pygame.mouse.get_pos()
             
@@ -3139,7 +3144,7 @@ class Viewer(object):
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.raingroup, False)
                 for myexplosion in crashgroup:
                       if mymonster.burntime > 0.0:
-                          mymonster.burntime-= 20.0 * Game.MAGIC_POWER         
+                          mymonster.burntime-= 20.0 * Game.MAGIC_POWER
             for mymonster in self.monstergroup:
                 crashgroup = pygame.sprite.spritecollide(mymonster, self.explosiongroup, False)
                 for myexplosion in crashgroup:
